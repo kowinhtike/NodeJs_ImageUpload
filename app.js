@@ -5,7 +5,7 @@ var fss = require('fs');
 var url = require('url');
 var path = require("path");
 imag_data = '';
-
+var myJson = {}
 
 
 http.createServer(function (req, res) {
@@ -14,24 +14,26 @@ http.createServer(function (req, res) {
     var form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
 
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      res.write("User ID : " + fields.userID[0] + "<br>");
-      res.write( "User Password : " + fields.password[0] + "<br>");
-      res.write('File uploaded <br>');
+      //res.writeHead(200, {'Content-Type': 'text/html'});
+      //res.write("User ID : " + fields.userID[0] + "<br>");
+      //res.write( "User Password : " + fields.password[0] + "<br>");
+      //res.write('File uploaded <br>');
+
+      myJson.id = fields.userID[0];
+      myJson.password =  fields.password[0];
+
       console.log("Successful!");
-      function added(xx){
-        res.write(xx);
-      }
   
       var newpath = __dirname+ '\\image\\'+files.filetoupload[0].originalFilename
       var uploaded_img_path = 'image/'+files.filetoupload[0].originalFilename;
-      res.write(`<a href="${uploaded_img_path}"> ${'image/'+files.filetoupload[0].originalFilename} </a> `)
+      myJson.img = uploaded_img_path;
+      //res.write(`<a href="${uploaded_img_path}"> ${'image/'+files.filetoupload[0].originalFilename} </a> `)
 
       var oldpath = files.filetoupload[0].filepath
 
       fs.rename(oldpath, newpath, function (err) {
         if (err) throw err;
-        res.write('<br> <br> File uploaded and moved! <br> <br>');
+       // res.write('<br> <br> File uploaded and moved! <br> <br>');
       });
 
                 // read image file
@@ -41,6 +43,7 @@ http.createServer(function (req, res) {
       console.log("First Error");
         throw err;
     } 
+
     // get image file extension name
     const extensionName = path.extname(newpath);
     
@@ -51,7 +54,8 @@ http.createServer(function (req, res) {
     const base64ImageStr = `data:image/${extensionName.split('.').pop()};base64,${base64Image}`;
     console.log("image reached")
     imag_data = base64ImageStr;
-    res.write(`<img src="${imag_data}" width="200px" >`)
+    res.write(JSON.stringify(myJson))
+    //res.write(`<img src="${imag_data}" width="200px" >`)
     res.end();
 })
     });
